@@ -376,6 +376,13 @@ def update_presupuesto(tid,cid,anio,mes):
                (new_id('B'),tid,cid,int(anio),int(mes),b.get('monto',0),b.get('monto',0)))
     db.commit(); db.close(); return ok({'updated':True})
 
+@app.route('/api/presupuestos/<tid>/<cid>/<anio>', methods=['DELETE'])
+def delete_presupuesto_anio(tid, cid, anio):
+    db = get_db()
+    db.execute('DELETE FROM presupuestos WHERE team_id=? AND codigo_id=? AND anio=?', (tid, cid, int(anio)))
+    db.commit(); db.close()
+    return ok({'deleted': True})
+
 # ════════════════════════════════════════════════════════════════
 # API — PAGOS
 # ════════════════════════════════════════════════════════════════
