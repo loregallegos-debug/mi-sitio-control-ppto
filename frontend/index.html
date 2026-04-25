@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FinTrack · Gestión Financiera</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nv:#0F2341;--n2:#1B3A6B;--tl:#00A8A8;--t2:#E8F7F7;
+  --rd:#DC2626;--r2:#FEF2F2;--or:#EA580C;--o2:#FFF7ED;
+  --gn:#16A34A;--g2:#F0FDF4;--pu:#7C3AED;--p2:#F5F3FF;
+  --c1:#F8FAFC;--c2:#E2E8F0;--c5:#64748B;--c7:#334155;--c9:#0F172A;
+  --wh:#FFFFFF;--fn:'IBM Plex Sans',system-ui,sans-serif;--fm:'IBM Plex Mono',monospace;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+body{font-family:var(--fn);background:var(--c1);color:var(--c9);font-size:13px;height:100vh;overflow:hidden;display:flex}
+
+/* ─── SIDEBAR ─── */
+.sb{width:196px;min-width:196px;background:var(--nv);display:flex;flex-direction:column;height:100vh;overflow-y:auto}
+.sb-logo{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-brand{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.sb-brand em{color:var(--tl);font-style:normal}
+.sb-ver{font-size:9px;background:rgba(0,168,168,.25);color:var(--tl);padding:1px 6px;border-radius:10px;margin-left:6px}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.25);margin-top:2px}
+.sb-nav{padding:8px 0;flex:1}
+.sb-sec{padding:10px 13px 3px;font-size:9px;color:rgba(255,255,255,.18);letter-spacing:.8px;text-transform:uppercase;font-weight:500}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12px;border-left:2px solid transparent;transition:all .1s;user-select:none}
+.ni:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.8)}
+.ni.on{background:rgba(0,168,168,.1);color:var(--tl);border-left-color:var(--tl);font-weight:500}
+.ni-ic{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.badge{font-size:9px;padding:1px 5px;border-radius:8px;margin-left:auto;font-weight:600}
+.badge-tl{background:rgba(0,168,168,.3);color:var(--tl)}
+.badge-rd{background:rgba(220,38,38,.3);color:#FCA5A5}
+.sb-foot{padding:10px 13px;border-top:1px solid rgba(255,255,255,.06);font-size:10px;color:rgba(255,255,255,.3)}
+
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--wh);border-bottom:1px solid var(--c2);padding:0 16px;height:46px;display:flex;align-items:center;gap:8px;flex-shrink:0;box-shadow:var(--shadow)}
+.tb-title{font-size:13px;font-weight:600;flex:1;color:var(--c9)}
+.tb-sep{width:1px;height:20px;background:var(--c2)}
+select,input,textarea{font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--c2);border-radius:var(--radius);background:var(--wh);color:var(--c9);outline:none;transition:border-color .15s}
+select:focus,input:focus{border-color:var(--tl)}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border:none;border-radius:var(--radius);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fn);transition:opacity .12s;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-tl{background:var(--tl);color:#fff}
+.btn-nv{background:var(--n2);color:#fff}
+.btn-gh{background:var(--wh);border:1px solid var(--c2);color:var(--c7)}
+.btn-rd{background:var(--r2);color:var(--rd);border:1px solid #FECACA}
+.btn-sm{padding:3px 8px;font-size:10px}
+.content{flex:1;overflow-y:auto;padding:16px}
+.view{display:none}.view.on{display:block}
+
+/* ─── CARDS ─── */
+.krow{display:grid;gap:8px;margin-bottom:12px}
+.kc{background:var(--wh);border:1px solid var(--c2);border-radius:var(--radius);padding:12px;border-top:3px solid var(--c2);box-shadow:var(--shadow)}
+.kc.b{border-top-color:var(--n2)}.kc.t{border-top-color:var(--tl)}.kc.r{border-top-color:var(--rd)}
+.kc.o{border-top-color:var(--or)}.kc.g{border-top-color:var(--gn)}.kc.p{border-top-color:var(--pu)}
+.kl{font-size:10px;color:var(--c5);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:500}
+.kv{font-size:19px;font-weight:600;font-family:var(--fm);letter-spacing:-.5px}
+.ks{font-size:10px;color:var(--c5);margin-top:2px}
+.card{background:var(--wh);border:1px solid var(--c2);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.card-t{font-size:12px;font-weight:600;color:var(--c9)}
+.tw{background:var(--wh);border:1px solid var(--c2);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow)}
+.th{padding:9px 13px;border-bottom:1px solid var(--c2);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--c1)}
+.tt{font-size:12px;font-weight:600;color:var(--c9)}
+table{width:100%;border-collapse:collapse}
+th{padding:7px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--c5);background:var(--c1);border-bottom:1px solid var(--c2)}
+td{padding:8px 12px;font-size:12px;border-bottom:1px solid var(--c2);color:var(--c7)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFC}
+.mn{font-family:var(--fm);font-size:11px}
+
+/* ─── TAGS ─── */
+.tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:500;white-space:nowrap}
+.tg-pep{background:#EFF6FF;color:#1D4ED8}.tg-ord{background:var(--p2);color:#5B21B6}
+.tg-cap{background:#EFF6FF;color:#1D4ED8}.tg-opx{background:var(--p2);color:#5B21B6}
+.tg-ok{background:var(--g2);color:var(--gn)}.tg-ko{background:var(--r2);color:var(--rd)}
+.tg-warn{background:var(--o2);color:var(--or)}.tg-off{background:var(--c2);color:var(--c5)}
+.tg-usd{background:#EFF6FF;color:#1D4ED8}.tg-clp{background:var(--p2);color:#5B21B6}
+.tg-uf{background:var(--o2);color:var(--or)}.tg-brl{background:var(--g2);color:var(--gn)}
+.tg-eur{background:#F5F3FF;color:var(--pu)}
+.up{color:var(--rd);background:var(--r2);padding:1px 5px;border-radius:4px;font-size:10px;font-weight:600}
+.dn{color:var(--gn);background:var(--g2);padding:1px 5px;border-radius:4px;font-size:10px;font-weight:600}
+.pb{height:4px;background:var(--c2);border-radius:3px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle}
+.pf{height:100%;border-radius:3px;transition:width .3s}
+
+/* ─── MODAL ─── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,35,65,.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-bg.on{display:flex}
+.modal{background:var(--wh);border-radius:10px;width:520px;max-width:96vw;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-h{padding:14px 18px;border-bottom:1px solid var(--c2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--wh);z-index:1}
+.modal-h h3{font-size:13px;font-weight:600}
+.modal-x{background:none;border:none;cursor:pointer;font-size:18px;color:var(--c5);line-height:1}
+.modal-b{padding:16px;flex:1}
+.modal-f{padding:12px 16px;border-top:1px solid var(--c2);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--wh)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg1{grid-column:1/-1}
+.fl{display:flex;flex-direction:column;gap:3px}
+.fl label{font-size:11px;font-weight:500;color:var(--c7)}
+input,select,textarea{width:100%}
+
+/* ─── FTE ─── */
+.fte-card{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--c2);transition:background .1s}
+.fte-card:hover,.fte-card.sel{background:var(--t2)}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;flex-shrink:0}
+
+/* ─── MES GRID ─── */
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.mgm{background:var(--wh);border:1px solid var(--c2);border-radius:var(--radius);padding:9px;cursor:pointer;transition:border-color .1s}
+.mgm:hover,.mgm.sel{border-color:var(--tl);background:var(--t2)}
+.mgm.has{border-color:var(--n2)}
+.mgm-lbl{font-size:10px;font-weight:600;color:var(--c5);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.mgm-val{font-size:13px;font-weight:700;font-family:var(--fm)}
+
+/* ─── FILTROS ─── */
+.filters{background:var(--wh);border:1px solid var(--c2);border-radius:var(--radius);padding:9px 13px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:var(--shadow)}
+.flt{display:flex;align-items:center;gap:5px}
+.flt label{font-size:10px;font-weight:600;color:var(--c5);white-space:nowrap}
+.fsep{width:1px;height:18px;background:var(--c2)}
+.chip{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+
+/* ─── TABS ─── */
+.tabs{display:flex;border-bottom:2px solid var(--c2);margin-bottom:12px}
+.tab{padding:7px 14px 9px;font-size:11px;font-weight:500;cursor:pointer;color:var(--c5);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .1s}
+.tab:hover{color:var(--c9)}.tab.on{color:var(--n2);border-bottom-color:var(--n2)}
+.tp{display:none}.tp.on{display:block}
+
+/* ─── LOADING / EMPTY ─── */
+.loading{text-align:center;padding:28px;color:var(--c5);font-size:12px}
+.loading::before{content:'⟳ ';animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:24px;color:var(--c5);font-size:12px}
+.toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:var(--radius);font-size:12px;font-weight:500;z-index:999;opacity:1;transition:opacity .3s;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.tok{background:var(--gn);color:#fff}.terr{background:var(--rd);color:#fff}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--c2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-brand">Fin<em>Track</em><span class="sb-ver">v3</span></div>
+    <div class="sb-sub">Gestión financiera</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Principal</div>
+    <div class="ni on" data-v="dashboard"><span class="ni-ic">◈</span>Dashboard</div>
+    <div class="ni" data-v="alertas"><span class="ni-ic">◉</span>Alertas <span class="badge badge-rd" id="nb-al">0</span></div>
+    <div class="sb-sec">Finanzas</div>
+    <div class="ni" data-v="presupuesto"><span class="ni-ic">◎</span>Presupuesto</div>
+    <div class="ni" data-v="pagos"><span class="ni-ic">◇</span>Pagos</div>
+    <div class="ni" data-v="forecast"><span class="ni-ic">◈</span>Forecast</div>
+    <div class="ni" data-v="trazabilidad"><span class="ni-ic">⊹</span>Trazabilidad</div>
+    <div class="sb-sec">Personas</div>
+    <div class="ni" data-v="fte"><span class="ni-ic">◍</span>Gestión FTE</div>
+    <div class="sb-sec">Maestros</div>
+    <div class="ni" data-v="teams"><span class="ni-ic">▦</span>Teams <span class="badge badge-tl">CRUD</span></div>
+    <div class="ni" data-v="codigos"><span class="ni-ic">▤</span>PEP / Órdenes <span class="badge badge-tl">CRUD</span></div>
+    <div class="ni" data-v="proveedores"><span class="ni-ic">▷</span>Proveedores</div>
+    <div class="sb-sec">Config</div>
+    <div class="ni" data-v="tc"><span class="ni-ic">◑</span>Tipos de cambio</div>
+  </nav>
+  <div class="sb-foot">FinTrack · Dispatch Management</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+  <div class="tb-title" id="tb-t">Dashboard</div>
+  <div class="tb-sep"></div>
+  <select id="f-anio" onchange="refresh()" style="width:80px"><option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option></select>
+  <select id="f-team" onchange="refresh()" style="width:170px"><option value="">Todos los teams</option></select>
+  <div class="tb-sep"></div>
+  <button class="btn btn-gh btn-sm" onclick="exportCSV()">⬇ CSV</button>
+  <button class="btn btn-tl btn-sm" onclick="openM('pago')">+ Nuevo pago</button>
+</div>
+<div class="content" id="app-content">
+
+<!-- DASHBOARD -->
+<div class="view on" id="v-dashboard">
+  <div class="filters">
+    <div class="flt"><label>Período</label>
+      <select id="d-per" onchange="renderDash()" style="width:110px">
+        <option value="anual">Anual</option><option value="q1">Q1</option><option value="q2">Q2</option><option value="q3">Q3</option><option value="q4">Q4</option>
+        <option value="1">Ene</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Abr</option><option value="5">May</option><option value="6">Jun</option>
+        <option value="7">Jul</option><option value="8">Ago</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dic</option>
+      </select>
+    </div>
+    <div class="fsep"></div>
+    <div class="flt"><label>Naturaleza</label>
+      <select id="d-nat" onchange="renderDash()" style="width:120px">
+        <option value="all">CAPEX + OPEX</option><option value="CAPEX">Solo CAPEX</option><option value="OPEX">Solo OPEX</option>
+      </select>
+    </div>
+    <div class="fsep"></div>
+    <div class="flt"><label>Tipo</label>
+      <select id="d-tipo" onchange="updCodSel();renderDash()" style="width:110px">
+        <option value="all">PEP + Orden</option><option value="PEP">Solo PEP</option><option value="Orden">Solo Orden</option>
+      </select>
+    </div>
+    <div class="fsep"></div>
+    <div class="flt"><label>Código</label>
+      <select id="d-cod" onchange="renderDash()" style="width:190px"><option value="">Todos los códigos</option></select>
+    </div>
+    <div id="d-chips" style="margin-left:auto;display:flex;gap:4px"></div>
+  </div>
+  <div class="krow" id="d-kpis" style="grid-template-columns:repeat(5,1fr)"><div class="loading">Cargando...</div></div>
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:10px">
+    <div class="card" style="margin-bottom:0"><div class="card-h"><div class="card-t">Real vs Presupuesto por equipo</div></div><div id="d-bars" class="loading">Cargando...</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-h"><div class="card-t">CAPEX vs OPEX</div></div><div id="d-donut"></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div class="card" style="margin-bottom:0"><div class="card-h"><div class="card-t">Gasto por proveedor</div></div><div id="d-provs"></div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-h"><div class="card-t">Tendencia mensual</div></div><div id="d-trend"></div></div>
+  </div>
+  <div class="tw"><div class="th"><div class="tt">Resumen por equipo</div><input placeholder="Buscar..." oninput="filt('d-tbl',this.value)" style="width:150px"></div>
+  <table><thead><tr><th>Equipo</th><th>Real USD</th><th>Presupuesto</th><th>Desviación</th><th>Ejecución</th><th>PM</th><th>Estado</th></tr></thead><tbody id="d-tbl"></tbody></table></div>
+</div>
+
+<!-- ALERTAS -->
+<div class="view" id="v-alertas">
+  <div class="krow" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kc r"><div class="kl">Críticas</div><div class="kv" id="al-cr">—</div></div>
+    <div class="kc o"><div class="kl">Advertencias</div><div class="kv" id="al-wr">—</div></div>
+    <div class="kc g"><div class="kl">Teams ok</div><div class="kv" id="al-ok">—</div></div>
+  </div>
+  <div id="al-list" class="loading">Cargando...</div>
+</div>
+
+<!-- PRESUPUESTO -->
+<div class="view" id="v-presupuesto">
+  <div class="filters">
+    <div class="flt"><label>Team</label><select id="pp-team" onchange="renderPpto()" style="width:180px"><option value="">Todos los teams</option></select></div>
+    <div class="flt"><label>Código</label><select id="pp-cod" onchange="renderPpto()" style="width:200px"><option value="">Todos los códigos</option></select></div>
+    <button class="btn btn-nv btn-sm" style="margin-left:auto" onclick="openM('ppto')">+ Cargar presupuesto</button>
+  </div>
+  <div id="pp-content" class="loading">Cargando...</div>
+</div>
+
+<!-- PAGOS -->
+<div class="view" id="v-pagos">
+  <div class="filters">
+    <div class="flt"><label>Team</label><select id="pg-team" onchange="renderPagos()" style="width:160px"><option value="">Todos</option></select></div>
+    <div class="flt"><label>Código</label><select id="pg-cod" onchange="renderPagos()" style="width:190px"><option value="">Todos</option></select></div>
+    <button class="btn btn-tl btn-sm" style="margin-left:auto" onclick="openM('pago')">+ Nuevo pago</button>
+  </div>
+  <div class="mgrid" id="pg-grid"></div>
+  <div class="tw"><div class="th"><div class="tt" id="pg-tt">Todos los pagos</div><input placeholder="Buscar..." oninput="filt('pg-tbl',this.value)" style="width:190px"></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Team</th><th>Persona</th><th>Proveedor</th><th>Cat.</th><th>Código</th><th>Orig.</th><th>Mon.</th><th>USD</th><th>Días</th><th>Desc.</th><th></th></tr></thead><tbody id="pg-tbl"></tbody></table></div></div>
+</div>
+
+<!-- FORECAST -->
+<div class="view" id="v-forecast">
+  <div class="krow" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc b"><div class="kl">Real acumulado</div><div class="kv" id="fc-r">—</div></div>
+    <div class="kc t"><div class="kl">Forecast restante</div><div class="kv" id="fc-f">—</div></div>
+    <div class="kc o"><div class="kl">Cierre proyectado</div><div class="kv" id="fc-c">—</div></div>
+    <div class="kc p"><div class="kl">vs Presupuesto</div><div class="kv" id="fc-v">—</div></div>
+  </div>
+  <div class="filters">
+    <div class="flt"><label>Team</label><select id="fc-team" onchange="renderFc()" style="width:170px"><option value="">Todos</option></select></div>
+    <div class="flt"><label>Naturaleza</label><select id="fc-nat" onchange="renderFc()" style="width:130px"><option value="all">CAPEX+OPEX</option><option value="CAPEX">CAPEX</option><option value="OPEX">OPEX</option></select></div>
+    <div class="flt"><label>Código</label><select id="fc-cod" onchange="renderFc()" style="width:190px"><option value="">Todos</option></select></div>
+  </div>
+  <div class="mgrid" id="fc-grid"></div>
+  <div class="card"><div class="card-h"><div class="card-t">Real vs Forecast vs Presupuesto</div></div><div id="fc-chart"></div></div>
+</div>
+
+<!-- TRAZABILIDAD -->
+<div class="view" id="v-trazabilidad">
+  <div class="card" style="background:#FEFCE8;border-color:#FDE047;margin-bottom:12px">
+    <div style="font-size:12px;font-weight:600;margin-bottom:5px">¿Para qué sirve Trazabilidad?</div>
+    <div style="font-size:11px;color:var(--c7);line-height:1.7">Registra cada conversión de moneda (CLP/UF/BRL → USD) con el tipo de cambio exacto del día. Sirve para auditorías de Finanzas, reconciliación contable y verificar que ningún número fue estimado.</div>
+  </div>
+  <div class="tw"><div class="th"><div class="tt">Pagos en moneda distinta a USD</div><input placeholder="Buscar..." oninput="filt('tr-tbl',this.value)" style="width:180px"></div>
+  <table><thead><tr><th>Fecha</th><th>Persona</th><th>Proveedor</th><th>Monto original</th><th>Moneda</th><th>TC aplicado</th><th>USD</th><th>Código</th></tr></thead><tbody id="tr-tbl"></tbody></table></div>
+</div>
+
+<!-- FTE -->
+<div class="view" id="v-fte">
+  <div class="krow" id="fte-kpis" style="grid-template-columns:repeat(5,1fr)"></div>
+  <div class="tabs">
+    <div class="tab on"  onclick="ftTab(this,'ft-dir')">Directorio</div>
+    <div class="tab" onclick="ftTab(this,'ft-hc')">Headcount</div>
+    <div class="tab" onclick="ftTab(this,'ft-pagos')">Pagos por persona</div>
+  </div>
+  <div class="tp on" id="ft-dir">
+    <div class="filters">
+      <div class="flt"><label>Team</label><select id="fte-tf" onchange="renderFteList()" style="width:180px"><option value="">Todos</option></select></div>
+      <div class="flt"><label>Tipo</label><select id="fte-tt" onchange="renderFteList()" style="width:120px"><option value="">Todos</option><option value="Interna">Interna</option><option value="Externa">Externa</option><option value="Consultora">Consultora</option></select></div>
+      <button class="btn btn-tl btn-sm" style="margin-left:auto" onclick="openM('fte')">+ Agregar persona</button>
+    </div>
+    <div style="display:grid;grid-template-columns:270px 1fr;gap:10px;min-height:380px">
+      <div class="tw" style="margin-bottom:0;display:flex;flex-direction:column">
+        <div class="th"><span class="tt" id="fte-cnt">Personas</span><button class="btn btn-nv btn-sm" onclick="openM('fte')">+ Nueva</button></div>
+        <div id="fte-list" style="overflow-y:auto;flex:1"></div>
+      </div>
+      <div id="fte-det" style="background:var(--wh);border:1px solid var(--c2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--c5);box-shadow:var(--shadow)">
+        <div style="font-size:28px;opacity:.2">👤</div>
+        <div style="font-weight:500">Selecciona una persona</div>
+        <div style="font-size:11px">para ver su detalle y pagos</div>
+      </div>
+    </div>
+  </div>
+  <div class="tp" id="ft-hc">
+    <div class="filters">
+      <div class="flt"><label>Año</label><select id="hc-anio" onchange="renderHC()" style="width:80px"><option value="2026">2026</option><option value="2025">2025</option></select></div>
+      <div class="flt"><label>Team</label><select id="hc-team" onchange="renderHC()" style="width:180px"><option value="">Todos</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="card" style="margin-bottom:0"><div class="card-h" style="margin-bottom:8px"><div class="card-t">Por equipo</div></div><div id="hc-team-chart"></div></div>
+      <div class="card" style="margin-bottom:0"><div class="card-h" style="margin-bottom:8px"><div class="card-t">Por quarter</div></div><div id="hc-q-chart"></div></div>
+      <div class="card" style="margin-bottom:0"><div class="card-h" style="margin-bottom:8px"><div class="card-t">Por mes</div></div><div id="hc-m-chart"></div></div>
+    </div>
+    <div class="card"><div class="card-h" style="margin-bottom:8px"><div class="card-t">Costo por proveedor</div></div><div id="hc-prov-chart"></div></div>
+  </div>
+  <div class="tp" id="ft-pagos">
+    <div class="filters">
+      <div class="flt"><label>Team</label><select id="ftp-team" onchange="renderFtePagos()" style="width:180px"><option value="">Todos</option></select></div>
+      <div class="flt"><label>Quarter</label><select id="ftp-q" onchange="renderFtePagos()" style="width:110px"><option value="">Todo el año</option><option value="1">Q1</option><option value="2">Q2</option><option value="3">Q3</option><option value="4">Q4</option></select></div>
+    </div>
+    <div class="tw"><div class="th"><div class="tt" id="ftp-tt">Pagos por persona</div></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Persona</th><th>Empresa</th><th>Team</th><th>Código</th><th>Fecha</th><th>Días</th><th>Orig.</th><th>Mon.</th><th>USD</th><th>Desc.</th></tr></thead><tbody id="ftp-tbl"></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- TEAMS -->
+<div class="view" id="v-teams">
+  <div class="tw"><div class="th"><div class="tt">Teams</div><button class="btn btn-nv btn-sm" onclick="openM('team')">+ Nuevo team</button></div>
+  <table><thead><tr><th>Color</th><th>Nombre</th><th>PM</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="teams-tbl"></tbody></table></div>
+</div>
+
+<!-- CODIGOS -->
+<div class="view" id="v-codigos">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="tw" style="margin-bottom:0"><div class="th"><div class="tt">PEP · CAPEX</div><button class="btn btn-nv btn-sm" onclick="openM('cod','PEP')">+ Nuevo PEP</button></div>
+    <table><thead><tr><th>Código</th><th>Team</th><th>Descripción</th><th>Ppto.</th><th></th></tr></thead><tbody id="pep-tbl"></tbody></table></div>
+    <div class="tw" style="margin-bottom:0"><div class="th"><div class="tt">Órdenes · OPEX</div><button class="btn btn-nv btn-sm" onclick="openM('cod','Orden')">+ Nueva Orden</button></div>
+    <table><thead><tr><th>Código</th><th>Team</th><th>Descripción</th><th>Ppto.</th><th></th></tr></thead><tbody id="ord-tbl"></tbody></table></div>
+  </div>
+</div>
+
+<!-- PROVEEDORES -->
+<div class="view" id="v-proveedores">
+  <div class="tw"><div class="th"><div class="tt">Proveedores</div><div style="display:flex;gap:6px"><input placeholder="Buscar..." oninput="filt('prov-tbl',this.value)" style="width:150px"><button class="btn btn-nv btn-sm" onclick="openM('prov')">+ Nuevo</button></div></div>
+  <table><thead><tr><th>Nombre</th><th>Moneda</th><th>Categoría</th><th>Gasto YTD</th><th>Acciones</th></tr></thead><tbody id="prov-tbl"></tbody></table></div>
+</div>
+
+<!-- TC -->
+<div class="view" id="v-tc">
+  <div class="krow" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kc"><div class="kl">USD</div><div class="kv mn">1.0000</div></div>
+    <div class="kc t"><div class="kl">UF → USD</div><div class="kv mn">37.50</div></div>
+    <div class="kc t"><div class="kl">CLP → USD</div><div class="kv mn">0.00105</div></div>
+    <div class="kc g"><div class="kl">BRL → USD</div><div class="kv mn">0.1900</div></div>
+    <div class="kc p"><div class="kl">EUR → USD</div><div class="kv mn">1.0700</div></div>
+  </div>
+  <div class="card"><div class="card-h"><div class="card-t">Actualización manual</div></div>
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+      <div class="fl" style="min-width:80px"><label>Moneda</label><select id="tc-mon"><option>UF</option><option>CLP</option><option>BRL</option><option>EUR</option></select></div>
+      <div class="fl" style="min-width:120px"><label>Valor USD</label><input type="number" id="tc-val" placeholder="37.50" step="0.00001"></div>
+      <div class="fl" style="min-width:130px"><label>Fecha</label><input type="date" id="tc-fec"></div>
+      <button class="btn btn-nv" onclick="saveTC()">Guardar TC</button>
+    </div>
+  </div>
+  <div class="tw"><div class="th"><div class="tt">Historial</div></div>
+  <table><thead><tr><th>Fecha</th><th>Moneda</th><th>Valor USD</th><th>Fuente</th></tr></thead><tbody id="tc-tbl"></tbody></table></div>
+</div>
+
+</div><!-- content -->
+</div><!-- main -->
+
+<!-- ════════ MODALS ════════ -->
+<div class="modal-bg" id="m-pago"><div class="modal">
+  <div class="modal-h"><h3 id="m-pago-t">Nuevo pago</h3><button class="modal-x" onclick="closeM('pago')">✕</button></div>
+  <div class="modal-b"><div class="fg">
+    <div class="fl"><label>Team *</label><select id="mp-team" onchange="updMpPers()"></select></div>
+    <div class="fl"><label>Código *</label><select id="mp-cod"></select></div>
+    <div class="fl"><label>Persona</label><select id="mp-pers"><option value="">— Sin persona —</option></select></div>
+    <div class="fl"><label>% del código</label><input type="number" id="mp-pct" value="100" min="1" max="100"></div>
+    <div class="fl"><label>Proveedor</label><select id="mp-prov"><option value="">— Sin proveedor —</option></select></div>
+    <div class="fl"><label>Categoría</label><select id="mp-cat"><option>FTE</option><option>Licencias</option><option>Viajes</option><option>Otros</option></select></div>
+    <div class="fl"><label>Fecha *</label><input type="date" id="mp-fec"></div>
+    <div class="fl"><label>Días trabajados</label><input type="number" id="mp-dias" value="21" min="1" max="31"></div>
+    <div class="fl"><label>Monto original *</label><input type="number" id="mp-mnt" placeholder="0" oninput="calcTC()"></div>
+    <div class="fl"><label>Moneda</label><select id="mp-mon" onchange="calcTC()"><option>USD</option><option>BRL</option><option>CLP</option><option>UF</option><option>EUR</option></select></div>
+    <div class="fl fg1"><label>Conversión</label><div id="mp-tc" style="padding:7px 9px;background:var(--t2);border-radius:var(--radius);font-size:11px;font-family:var(--fm);color:#065F46">TC: — · USD: $0</div></div>
+    <div class="fl fg1"><label>Descripción</label><input type="text" id="mp-desc" placeholder="Detalle del pago"></div>
+  </div></div>
+  <div class="modal-f"><input type="hidden" id="mp-id"><button class="btn btn-gh" onclick="closeM('pago')">Cancelar</button><button class="btn btn-tl" onclick="savePago()">Guardar pago</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-ppto"><div class="modal" style="width:580px">
+  <div class="modal-h"><h3>Cargar presupuesto mensual</h3><button class="modal-x" onclick="closeM('ppto')">✕</button></div>
+  <div class="modal-b">
+    <div class="fg" style="margin-bottom:12px">
+      <div class="fl"><label>Team *</label><select id="bp-team" onchange="updBpCod()"></select></div>
+      <div class="fl"><label>Código *</label><select id="bp-cod"></select></div>
+      <div class="fl"><label>Año</label><select id="bp-anio"><option>2026</option><option>2025</option><option>2027</option></select></div>
+      <div class="fl" style="justify-content:flex-end"><button class="btn btn-gh btn-sm" onclick="equalPpto()">Distribuir igual</button></div>
+    </div>
+    <div style="font-size:11px;font-weight:500;color:var(--c7);margin-bottom:8px">Monto USD por mes:</div>
+    <div id="bp-meses" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px"></div>
+    <div style="margin-top:10px;padding:8px;background:var(--t2);border-radius:var(--radius);font-size:11px">Total anual: <strong id="bp-tot" style="font-family:var(--fm)">$0</strong></div>
+  </div>
+  <div class="modal-f"><button class="btn btn-gh" onclick="closeM('ppto')">Cancelar</button><button class="btn btn-tl" onclick="savePpto()">Guardar presupuesto</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-team"><div class="modal" style="width:400px">
+  <div class="modal-h"><h3 id="m-team-t">Nuevo team</h3><button class="modal-x" onclick="closeM('team')">✕</button></div>
+  <div class="modal-b"><div class="fg">
+    <div class="fl fg1"><label>Nombre *</label><input id="mt-nom"></div>
+    <div class="fl fg1"><label>PM Responsable</label><input id="mt-pm"></div>
+    <div class="fl"><label>Color</label><input type="color" id="mt-col" value="#1B3A6B" style="height:34px;padding:2px;cursor:pointer"></div>
+  </div></div>
+  <div class="modal-f"><input type="hidden" id="mt-id"><button class="btn btn-gh" onclick="closeM('team')">Cancelar</button><button class="btn btn-tl" onclick="saveTeam()">Guardar</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-cod"><div class="modal" style="width:440px">
+  <div class="modal-h"><h3 id="m-cod-t">Nuevo PEP</h3><button class="modal-x" onclick="closeM('cod')">✕</button></div>
+  <div class="modal-b"><div class="fg">
+    <div class="fl fg1"><label>Código *</label><input id="mc-cod" placeholder="VPA-GCI-26-099"></div>
+    <div class="fl fg1"><label>Descripción</label><input id="mc-desc" placeholder="Descripción del PEP u Orden"></div>
+    <div class="fl"><label>Tipo</label><select id="mc-tipo" onchange="updNat()"><option>PEP</option><option>Orden</option></select></div>
+    <div class="fl"><label>Naturaleza</label><input id="mc-nat" readonly value="CAPEX" style="background:var(--c1)"></div>
+    <div class="fl fg1"><label>Team</label><select id="mc-team"></select></div>
+    <div class="fl fg1"><label>Presupuesto total (USD)</label><input type="number" id="mc-ppto" placeholder="0"></div>
+  </div></div>
+  <div class="modal-f"><input type="hidden" id="mc-id"><button class="btn btn-gh" onclick="closeM('cod')">Cancelar</button><button class="btn btn-tl" onclick="saveCod()">Guardar</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-prov"><div class="modal" style="width:380px">
+  <div class="modal-h"><h3 id="m-prov-t">Nuevo proveedor</h3><button class="modal-x" onclick="closeM('prov')">✕</button></div>
+  <div class="modal-b"><div class="fg">
+    <div class="fl fg1"><label>Nombre *</label><input id="mv-nom"></div>
+    <div class="fl"><label>Moneda</label><select id="mv-mon"><option>USD</option><option>BRL</option><option>CLP</option><option>UF</option><option>EUR</option></select></div>
+    <div class="fl"><label>Categoría</label><select id="mv-cat"><option>FTE</option><option>Licencias</option><option>Viajes</option><option>Otros</option></select></div>
+  </div></div>
+  <div class="modal-f"><input type="hidden" id="mv-id"><button class="btn btn-gh" onclick="closeM('prov')">Cancelar</button><button class="btn btn-tl" onclick="saveProv()">Guardar</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-fte"><div class="modal" style="width:440px">
+  <div class="modal-h"><h3 id="m-fte-t">Nueva persona</h3><button class="modal-x" onclick="closeM('fte')">✕</button></div>
+  <div class="modal-b"><div class="fg">
+    <div class="fl fg1"><label>Nombre completo *</label><input id="mf-nom" placeholder="Nombre Apellido"></div>
+    <div class="fl"><label>Cargo / Rol</label><input id="mf-cargo" placeholder="Ej: Tech Lead"></div>
+    <div class="fl"><label>Empresa</label><input id="mf-emp" placeholder="Nombre empresa"></div>
+    <div class="fl"><label>Tipo</label><select id="mf-tipo"><option>Externa</option><option>Interna</option><option>Consultora</option></select></div>
+    <div class="fl"><label>Email</label><input type="email" id="mf-email"></div>
+    <div class="fl"><label>Team principal</label><select id="mf-team"><option value="">— Selecciona —</option></select></div>
+    <div class="fl"><label>Color avatar</label><input type="color" id="mf-col" value="#1B3A6B" style="height:34px;padding:2px"></div>
+  </div></div>
+  <div class="modal-f"><input type="hidden" id="mf-id"><button class="btn btn-gh" onclick="closeM('fte')">Cancelar</button><button class="btn btn-tl" onclick="saveFTE()">Guardar persona</button></div>
+</div></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// API CLIENT — 100% conectado al backend
+// ════════════════════════════════════════════════════════════════
+const MES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const TC  = { USD:1, CLP:0.00105, UF:37.50, BRL:0.19, EUR:1.07 };
+const COLORS = ['#1B3A6B','#00A8A8','#EA580C','#16A34A','#7C3AED','#DC2626','#CA8A04','#0284C7'];
+
+async function api(method, path, body) {
+  try {
+    const r = await fetch('/api'+path, {
+      method,
+      headers:{'Content-Type':'application/json'},
+      body: body ? JSON.stringify(body) : undefined
+    });
+    const j = await r.json();
+    if (!j.ok) { toast(j.error||'Error del servidor','err'); return null; }
+    return j.data;
+  } catch(e) {
+    toast('Error de conexión — ¿está corriendo el servidor?','err');
+    return null;
+  }
+}
+const GET  = p     => api('GET',p);
+const POST = (p,b) => api('POST',p,b);
+const PUT  = (p,b) => api('PUT',p,b);
+const DEL  = p     => api('DELETE',p);
+
+// ─── CACHE ───────────────────────────────────────────────────────
+let _teams=[], _cods=[], _provs=[], _personas=[];
+async function loadMasters(){
+  [_teams,_cods,_provs,_personas] = await Promise.all([
+    GET('/teams'), GET('/codigos'), GET('/proveedores'), GET('/personas')
+  ]);
+  _teams   = _teams   || [];
+  _cods    = _cods    || [];
+  _provs   = _provs   || [];
+  _personas= _personas|| [];
+  populateSels();
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────
+const fmt=n=>{if(!n&&n!==0)return'$0';const a=Math.abs(n),s=n<0?'-':'';return a>=1e6?s+'$'+(a/1e6).toFixed(2)+'M':a>=1000?s+'$'+Math.round(a/1000)+'K':s+'$'+Math.round(a);};
+const ini=n=>(n||'').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const anio=()=>parseInt(document.getElementById('f-anio')?.value||2026);
+const fteam=()=>document.getElementById('f-team')?.value||'';
+const filt=(id,q)=>document.querySelectorAll('#'+id+' tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});
+const monTag=m=>m==='USD'?'tg-usd':m==='CLP'?'tg-clp':m==='UF'?'tg-uf':m==='BRL'?'tg-brl':'tg-eur';
+
+function toast(msg,type){
+  const el=document.createElement('div');
+  el.className='toast '+(type==='err'?'terr':'tok');
+  el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),300);},2400);
+}
+
+// ─── SVG CHARTS ──────────────────────────────────────────────────
+function svgBars(data,h=140){
+  if(!data.length)return'<div class="empty">Sin datos</div>';
+  const n=data.length,bw=Math.max(20,Math.min(36,Math.floor(180/n)-6));
+  const gap=Math.max(8,Math.floor(30/n)),pad=24,lblH=32;
+  const svgW=n*(bw*2+gap)+pad*2;
+  const maxV=Math.max(...data.map(d=>Math.max(d.real||0,d.ppto||0)),1);
+  let bars='';
+  data.forEach((d,i)=>{
+    const r=d.real||0,b=d.ppto||0;
+    const rh=Math.max(Math.round((r/maxV)*(h-16)),r>0?2:0);
+    const bh=Math.max(Math.round((b/maxV)*(h-16)),b>0?2:0);
+    const x=pad+i*(bw*2+gap);
+    const col=d.color||COLORS[i%COLORS.length];
+    const words=(d.label||'').split(' ');
+    bars+=`<rect x="${x}" y="${h-rh}" width="${bw}" height="${rh}" fill="${col}" rx="2"/>
+    <rect x="${x+bw+2}" y="${h-bh}" width="${bw}" height="${bh}" fill="#E2E8F0" rx="2"/>
+    <text x="${x+bw}" y="${h+12}" text-anchor="middle" font-size="8" fill="#64748B">${words.slice(0,2).join(' ')}</text>
+    ${words.length>2?`<text x="${x+bw}" y="${h+22}" text-anchor="middle" font-size="8" fill="#64748B">${words.slice(2).join(' ')}</text>`:''}
+    ${rh>12?`<text x="${x+bw/2}" y="${h-rh-4}" text-anchor="middle" font-size="8" font-weight="500" fill="${col}">${fmt(r)}</text>`:''}`;
+  });
+  return`<svg width="100%" viewBox="0 0 ${svgW} ${h+lblH}" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:100%;overflow:visible">${bars}</svg>
+  <div style="display:flex;gap:12px;margin-top:2px;font-size:10px;color:var(--c5)">
+    <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:var(--n2);border-radius:2px;display:inline-block"></span>Real</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#E2E8F0;border-radius:2px;display:inline-block"></span>Ppto</span>
+  </div>`;
+}
+
+function svgDonut(capex,opex){
+  const tot=capex+opex||1,r=48,cx=58,cy=62,sw=16;
+  const pct=Math.round(capex/tot*100),full=2*Math.PI*r,dash=pct/100*full;
+  return`<div style="display:flex;align-items:center;gap:14px">
+    <svg width="116" height="124" viewBox="0 0 116 124" style="flex-shrink:0">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#00A8A8" stroke-width="${sw}"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1B3A6B" stroke-width="${sw}" stroke-dasharray="${dash} ${full}" stroke-dashoffset="${full/4}" transform="rotate(-90 ${cx} ${cy})"/>
+      <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="15" font-weight="600" font-family="IBM Plex Mono,monospace">${pct}%</text>
+      <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="#64748B">CAPEX</text>
+    </svg>
+    <div style="font-size:11px;line-height:2">
+      <div><span style="display:inline-block;width:8px;height:8px;background:#1B3A6B;border-radius:2px;margin-right:5px;vertical-align:middle"></span><span style="color:var(--n2);font-weight:600">CAPEX</span><br><span style="font-family:IBM Plex Mono,monospace;font-size:13px;font-weight:600">${fmt(capex)}</span></div>
+      <div style="margin-top:6px"><span style="display:inline-block;width:8px;height:8px;background:#00A8A8;border-radius:2px;margin-right:5px;vertical-align:middle"></span><span style="color:var(--tl);font-weight:600">OPEX</span><br><span style="font-family:IBM Plex Mono,monospace;font-size:13px;font-weight:600">${fmt(opex)}</span></div>
+    </div>
+  </div>`;
+}
+
+function svgHBars(data,labelKey,valKey){
+  if(!data||!data.length)return'<div class="empty">Sin datos</div>';
+  const maxV=Math.max(...data.map(d=>d[valKey]||0),1);
+  const bh=18,gap=5,svgH=data.length*(bh+gap)+8;
+  let bars='';
+  data.forEach((d,i)=>{
+    const w=Math.max(Math.round((d[valKey]/maxV)*220),d[valKey]>0?3:0);
+    const y=4+i*(bh+gap),nom=(d[labelKey]||'').slice(0,20);
+    bars+=`<rect x="0" y="${y}" width="${w}" height="${bh}" fill="${COLORS[i%COLORS.length]}" rx="3"/>
+    <text x="${w+5}" y="${y+13}" font-size="10" fill="#334155">${nom} <tspan font-weight="600">${fmt(d[valKey])}</tspan></text>`;
+  });
+  return`<svg width="100%" viewBox="0 0 380 ${svgH}" preserveAspectRatio="xMinYMid meet" style="display:block;overflow:visible;max-width:100%">${bars}</svg>`;
+}
+
+function svgTrend(tendencia){
+  const maxV=Math.max(...tendencia.flatMap(t=>[t.real,t.ppto]),1);
+  const W=310,H=90,padL=6,padR=6,padT=8,padB=18,iW=W-padL-padR,iH=H-padT-padB;
+  const px=i=>padL+i*(iW/11);
+  const py=v=>padT+iH-Math.round((v/maxV)*iH);
+  let grid='';
+  [.25,.5,.75,1].forEach(f=>{const y=padT+iH-Math.round(f*iH);grid+=`<line x1="${padL}" y1="${y}" x2="${padL+iW}" y2="${y}" stroke="#F1F5F9" stroke-width="1"/>`;});
+  const rPath=tendencia.map((t,i)=>t.real>0?(i===0||tendencia[i-1].real===0?'M':'L')+px(i)+','+py(t.real):'').filter(Boolean).join(' ');
+  const bPath=tendencia.map((t,i)=>t.ppto>0?(i===0||tendencia[i-1].ppto===0?'M':'L')+px(i)+','+py(t.ppto):'').filter(Boolean).join(' ');
+  const dots=tendencia.map((t,i)=>t.real>0?`<circle cx="${px(i)}" cy="${py(t.real)}" r="2.5" fill="#1B3A6B"/>`:'').join('');
+  const labs=MES.map((m,i)=>`<text x="${px(i)}" y="${H-3}" text-anchor="middle" font-size="8" fill="#94A3B8">${m.slice(0,1)}</text>`).join('');
+  return`<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:100%">
+    ${grid}
+    ${bPath?`<path d="${bPath}" fill="none" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="4,3"/>`:''}
+    ${rPath?`<path d="${rPath}" fill="none" stroke="#1B3A6B" stroke-width="2"/>`:''}
+    ${dots}${labs}
+  </svg>`;
+}
+
+// ─── NAVIGATE ────────────────────────────────────────────────────
+const TITLES={dashboard:'Dashboard',alertas:'Alertas',presupuesto:'Presupuesto',pagos:'Pagos',forecast:'Forecast',trazabilidad:'Trazabilidad',fte:'Gestión FTE',teams:'Teams',codigos:'PEP / Órdenes',proveedores:'Proveedores',tc:'Tipos de cambio'};
+let curV='dashboard';
+const renders={};
+
+document.querySelectorAll('.ni[data-v]').forEach(el=>{
+  el.addEventListener('click',function(){
+    curV=this.dataset.v;
+    document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));this.classList.add('on');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+    document.getElementById('v-'+curV)?.classList.add('on');
+    document.getElementById('tb-t').textContent=TITLES[curV]||curV;
+    renders[curV]?.();
+  });
+});
+function refresh(){loadMasters().then(()=>renders[curV]?.());}
+
+// ─── POPULATE SELECTS ────────────────────────────────────────────
+function populateSels(){
+  const tAll='<option value="">Todos los teams</option>'+_teams.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('');
+  const tReq='<option value="">— Selecciona —</option>'+_teams.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('');
+  ['f-team','pg-team','pp-team','fc-team','fte-tf','ftp-team','hc-team'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const c=el.value;el.innerHTML=tAll;el.value=c;});
+  ['bp-team','mc-team','mp-team','mf-team'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const c=el.value;el.innerHTML=tReq;el.value=c;});
+  const cAll='<option value="">Todos los códigos</option>'+_cods.map(c=>`<option value="${c.id}">${c.codigo} (${c.naturaleza})</option>`).join('');
+  ['pg-cod','pp-cod','fc-cod'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const c=el.value;el.innerHTML=cAll;el.value=c;});
+  ['mp-cod'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const c=el.value;el.innerHTML='<option value="">— Selecciona —</option>'+_cods.map(c=>`<option value="${c.id}">${c.codigo}</option>`).join('');el.value=c;});
+  const pReq=_provs.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  const mpP=document.getElementById('mp-prov');if(mpP){const c=mpP.value;mpP.innerHTML='<option value="">— Sin proveedor —</option>'+pReq;mpP.value=c;}
+  const mpFec=document.getElementById('mp-fec');if(mpFec&&!mpFec.value)mpFec.value=new Date().toISOString().slice(0,10);
+  const tcFec=document.getElementById('tc-fec');if(tcFec&&!tcFec.value)tcFec.value=new Date().toISOString().slice(0,10);
+  updCodSel();
+}
+function updCodSel(){
+  const tipo=document.getElementById('d-tipo')?.value||'all';
+  const el=document.getElementById('d-cod');if(!el)return;
+  const cur=el.value;
+  const cods=_cods.filter(c=>tipo==='all'||c.tipo===tipo);
+  el.innerHTML='<option value="">Todos los códigos</option>'+cods.map(c=>`<option value="${c.id}">${c.codigo} · ${(c.descripcion||c.naturaleza).slice(0,22)}</option>`).join('');
+  if(cur&&cods.find(c=>c.id===cur))el.value=cur;
+}
+async function updMpPers(){
+  const tid=document.getElementById('mp-team')?.value||'';
+  const sel=document.getElementById('mp-pers');if(!sel)return;
+  const pers=_personas.filter(p=>!tid||(p.team_ids||'').includes(tid));
+  sel.innerHTML='<option value="">— Sin persona —</option>'+pers.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────────
+renders.dashboard=async function(){
+  const a=anio(),ft=fteam();
+  const per=document.getElementById('d-per')?.value||'anual';
+  const nat=document.getElementById('d-nat')?.value||'all';
+  const tipo=document.getElementById('d-tipo')?.value||'all';
+  const cod=document.getElementById('d-cod')?.value||'';
+  const params=new URLSearchParams({anio:a,periodo:per});
+  if(ft)params.set('team_id',ft);
+  if(nat!=='all')params.set('tipo',nat);
+  if(cod)params.set('cod_id',cod);
+  const d=await GET('/dashboard?'+params);
+  if(!d)return;
+
+  // Chips
+  const chips=[];
+  if(per!=='anual')chips.push({l:per.startsWith('q')?per.toUpperCase():MES[parseInt(per)-1],c:'#1B3A6B'});
+  if(nat!=='all')chips.push({l:nat,c:'#00A8A8'});
+  if(tipo!=='all')chips.push({l:tipo,c:'#EA580C'});
+  if(cod){const c=_cods.find(x=>x.id===cod);if(c)chips.push({l:c.codigo,c:'#7C3AED'});}
+  const chEl=document.getElementById('d-chips');
+  if(chEl)chEl.innerHTML=chips.map(ch=>`<span class="chip" style="background:${ch.c}18;color:${ch.c};border:1px solid ${ch.c}33">${ch.l}</span>`).join('');
+
+  // KPIs
+  const desv=d.real-d.ppto,desvP=d.ppto?(desv/d.ppto*100):0;
+  document.getElementById('d-kpis').innerHTML=`
+    <div class="kc b"><div class="kl">Gasto real</div><div class="kv">${fmt(d.real)}</div><div class="ks"><span class="${desv>0?'up':'dn'}">${desvP>=0?'+':''}${desvP.toFixed(1)}%</span> vs ppto</div></div>
+    <div class="kc t"><div class="kl">Presupuesto ${a}</div><div class="kv">${fmt(d.ppto)}</div><div class="ks">${per==='anual'?'Anual':per.startsWith('q')?per.toUpperCase():MES[parseInt(per)-1]||''}</div></div>
+    <div class="kc r"><div class="kl">Desviación</div><div class="kv" style="color:${desv>0?'var(--rd)':'var(--gn)'}">${desv>=0?'+':''}${fmt(desv)}</div></div>
+    <div class="kc g"><div class="kl">% Ejecución</div><div class="kv" style="color:${d.ejec>100?'var(--rd)':d.ejec>85?'var(--or)':'var(--gn)'}">${d.ejec.toFixed(1)}%</div></div>
+    <div class="kc p"><div class="kl">Filtro activo</div><div class="kv" style="font-size:12px;line-height:1.3">${cod?(_cods.find(c=>c.id===cod)?.codigo||'—'):(tipo==='all'?'Todos':tipo)}</div></div>`;
+
+  document.getElementById('d-bars').innerHTML=svgBars(d.byTeam.map(t=>({label:t.nombre,real:t.real_usd,ppto:t.ppto_usd,color:t.color})));
+  const capex=d.byTeam.reduce((s,t)=>s+(t.real_usd||0),0);
+  const pparams=new URLSearchParams({anio:a}); if(ft)pparams.set('team_id',ft);
+  const allP=await GET('/pagos?'+pparams);
+  const capexUsd=(allP||[]).filter(p=>p.naturaleza==='CAPEX').reduce((s,p)=>s+p.monto_usd,0);
+  const opexUsd =(allP||[]).filter(p=>p.naturaleza==='OPEX').reduce((s,p)=>s+p.monto_usd,0);
+  document.getElementById('d-donut').innerHTML=svgDonut(capexUsd,opexUsd);
+  document.getElementById('d-provs').innerHTML=d.byProv?.length?svgHBars(d.byProv,'nombre','total'):'<div class="empty">Sin pagos registrados</div>';
+  document.getElementById('d-trend').innerHTML=svgTrend(d.tendencia||[]);
+  document.getElementById('d-tbl').innerHTML=(d.byTeam||[]).map(t=>{
+    const r=t.real_usd||0,b=t.ppto_usd||0,dv=r-b,p=b?(r/b*100):0;
+    return`<tr>
+      <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${t.color};display:inline-block;flex-shrink:0"></span><strong>${t.nombre}</strong></span></td>
+      <td class="mn">${fmt(r)}</td><td class="mn">${fmt(b)}</td>
+      <td class="mn" style="color:${dv>0?'var(--rd)':'var(--gn)'}">${dv>=0?'+':''}${fmt(dv)}</td>
+      <td><div class="pb"><div class="pf" style="width:${Math.min(p,100)}%;background:${p>100?'var(--rd)':p>85?'var(--or)':'var(--tl)'}"></div></div> <small>${p.toFixed(1)}%</small></td>
+      <td style="font-size:11px">${t.pm||''}</td>
+      <td><span class="tag ${p>105?'tg-ko':p>90?'tg-warn':'tg-ok'}">${p>105?'Alerta':p>90?'Atención':'Ok'}</span></td>
+    </tr>`;
+  }).join('');
+  renders.alertas();
+};
+
+// ─── ALERTAS ─────────────────────────────────────────────────────
+renders.alertas=async function(){
+  const als=await GET('/alertas?anio='+anio());
+  if(!als)return;
+  const cr=als.filter(a=>a.tipo==='critica').length,wr=als.filter(a=>a.tipo==='advertencia').length;
+  ['al-cr','al-wr','al-ok'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=[cr,wr,Math.max(_teams.length-cr-wr,0)][i];});
+  const nb=document.getElementById('nb-al');if(nb){nb.textContent=cr+wr;nb.className='badge '+(cr>0?'badge-rd':'badge-tl');}
+  document.getElementById('al-list').innerHTML=als.length?als.map(a=>`
+    <div style="display:flex;gap:8px;padding:10px 12px;border-radius:var(--radius);margin-bottom:7px;font-size:12px;${a.tipo==='critica'?'background:var(--r2);color:var(--rd);border:1px solid #FECACA':'background:var(--o2);color:var(--or);border:1px solid #FED7AA'}">
+      <span style="width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;margin-top:4px"></span>
+      <div><strong>${a.team} — ${a.msg}</strong><br><span style="font-size:11px;opacity:.75">Real ${fmt(a.real)} vs ppto ${fmt(a.ppto)} · ${a.pct}%</span></div>
+    </div>`).join(''):'<div style="display:flex;gap:8px;padding:10px 12px;border-radius:var(--radius);background:var(--g2);color:var(--gn);border:1px solid #BBF7D0;font-size:12px"><span style="margin-top:4px">●</span><div>Todos los equipos dentro del rango ✓</div></div>';
+};
+
+// ─── PRESUPUESTO ─────────────────────────────────────────────────
+renders.presupuesto=async function(){
+  const a=anio(),tid=document.getElementById('pp-team')?.value||'',cid=document.getElementById('pp-cod')?.value||'';
+  const params=new URLSearchParams({anio:a});
+  if(tid)params.set('team_id',tid);if(cid)params.set('codigo_id',cid);
+  const bptos=await GET('/presupuestos?'+params);
+  if(!bptos)return;
+  const teams=_teams.filter(t=>!tid||t.id===tid);
+  let html='';
+  teams.forEach(t=>{
+    const cods=_cods.filter(c=>c.team_id===t.id&&(!cid||c.id===cid));
+    if(!cods.length)return;
+    html+=`<div class="tw"><div class="th" style="background:var(--c1)"><strong style="color:var(--n2)">${t.nombre}</strong></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Código</th><th>Tipo</th><th>Descripción</th>${MES.map(m=>`<th style="text-align:right;min-width:68px">${m}</th>`).join('')}<th style="text-align:right">Total</th></tr></thead><tbody>`;
+    cods.forEach(c=>{
+      const row=bptos.filter(b=>b.codigo_id===c.id);
+      const tot=row.reduce((s,b)=>s+(b.monto||0),0);
+      html+=`<tr><td class="mn">${c.codigo}</td><td><span class="tag ${c.tipo==='PEP'?'tg-pep':'tg-ord'}">${c.tipo}</span></td>
+      <td style="font-size:11px;color:var(--c5);max-width:130px;overflow:hidden;text-overflow:ellipsis">${c.descripcion||'—'}</td>`;
+      for(let m=1;m<=12;m++){
+        const b=row.find(r=>r.mes===m);
+        html+=`<td style="text-align:right"><span style="cursor:pointer;border-bottom:1px dashed var(--c5);font-family:var(--fm);font-size:11px" onclick="editB('${t.id}','${c.id}',${a},${m},this,${b?.monto||0})">${b?.monto?fmt(b.monto):'—'}</span></td>`;
+      }
+      html+=`<td class="mn" style="text-align:right;font-weight:600">${fmt(tot)}</td></tr>`;
+    });
+    html+='</tbody></table></div></div>';
+  });
+  document.getElementById('pp-content').innerHTML=html||'<div class="empty">Sin datos. Usa "+ Cargar presupuesto".</div>';
+};
+function editB(tid,cid,anio,mes,el,cur){
+  const inp=document.createElement('input');
+  inp.type='number';inp.value=cur||'';inp.style.cssText='width:70px;padding:2px 5px;border:1px solid var(--tl);border-radius:4px;font-family:var(--fm);font-size:11px;background:var(--t2)';
+  inp.onblur=async()=>{
+    const val=parseFloat(inp.value)||0;
+    await PUT(`/presupuestos/${tid}/${cid}/${anio}/${mes}`,{monto:val});
+    el.textContent=val?fmt(val):'—';inp.replaceWith(el);toast('Guardado','ok');
+  };
+  inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape')inp.replaceWith(el);};
+  el.replaceWith(inp);inp.focus();inp.select();
+}
+
+// ─── PAGOS ───────────────────────────────────────────────────────
+let pgMes=null;
+renders.pagos=async function(){
+  const a=anio(),tid=document.getElementById('pg-team')?.value||'',cid=document.getElementById('pg-cod')?.value||'';
+  const params=new URLSearchParams({anio:a});
+  if(tid)params.set('team_id',tid);if(cid)params.set('codigo_id',cid);
+  const pagos=await GET('/pagos?'+params);
+  if(!pagos)return;
+  document.getElementById('pg-grid').innerHTML=MES.map((m,i)=>{
+    const mes=i+1,mp=pagos.filter(p=>p.mes===mes),tot=mp.reduce((s,p)=>s+p.monto_usd,0),sel=pgMes===mes;
+    return`<div class="mgm${mp.length?' has':''}${sel?' sel':''}" onclick="pgFilter(${mes})">
+      <div class="mgm-lbl">${m}<span class="tag ${mp.length?'tg-ok':'tg-off'}" style="font-size:9px">${mp.length}</span></div>
+      ${tot?`<div class="mgm-val">${fmt(tot)}</div>`:'<div style="font-size:11px;color:var(--c5)">—</div>'}
+    </div>`;
+  }).join('');
+  const filtered=pgMes?pagos.filter(p=>p.mes===pgMes):pagos;
+  document.getElementById('pg-tt').textContent=pgMes?`Pagos de ${MES[pgMes-1]}`:'Todos los pagos';
+  document.getElementById('pg-tbl').innerHTML=filtered.sort((a,b)=>b.mes-a.mes).map(p=>`<tr>
+    <td style="font-size:10px">${p.fecha}</td>
+    <td><span style="display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${p.team_color||'#888'};display:inline-block"></span>${(p.team_nombre||'').split(' ').slice(0,2).join(' ')}</span></td>
+    <td style="font-size:11px;font-weight:500">${p.pers_nombre||'—'}</td>
+    <td style="font-size:11px">${p.prov_nombre||'—'}</td>
+    <td><span class="tag ${p.naturaleza==='CAPEX'?'tg-cap':'tg-opx'}">${p.categoria}</span></td>
+    <td class="mn" style="font-size:10px">${p.cod_nombre||''}</td>
+    <td class="mn">${(p.monto_orig||0).toLocaleString('es-CL')}</td>
+    <td><span class="tag ${monTag(p.moneda)}">${p.moneda}</span></td>
+    <td class="mn" style="font-weight:600">${fmt(p.monto_usd)}</td>
+    <td class="mn">${p.dias||'—'}</td>
+    <td style="font-size:10px;color:var(--c5);max-width:100px;overflow:hidden;text-overflow:ellipsis">${p.descripcion||''}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-gh btn-sm" onclick='openM("pago",${JSON.stringify(p)})'>✎</button>
+      <button class="btn btn-rd btn-sm" style="margin-left:2px" onclick="delPago('${p.id}')">✕</button>
+    </td>
+  </tr>`).join('');
+};
+function pgFilter(m){pgMes=pgMes===m?null:m;renders.pagos();}
+
+// ─── FORECAST ────────────────────────────────────────────────────
+renders.forecast=async function(){
+  const a=anio(),tid=document.getElementById('fc-team')?.value||'',cid=document.getElementById('fc-cod')?.value||'';
+  const [pagos,fcData,bData]=await Promise.all([
+    GET(`/pagos?anio=${a}`+(tid?`&team_id=${tid}`:'')),
+    GET(`/forecast?anio=${a}`+(tid?`&team_id=${tid}`:'')),
+    GET(`/presupuestos?anio=${a}`+(tid?`&team_id=${tid}`:'')),
+  ]);
+  if(!pagos||!fcData||!bData)return;
+  const realM=Array.from({length:12},(_,i)=>(pagos||[]).filter(p=>p.mes===i+1).reduce((s,p)=>s+p.monto_usd,0));
+  const pptoM=Array.from({length:12},(_,i)=>(bData||[]).filter(b=>b.mes===i+1).reduce((s,b)=>s+b.monto,0));
+  const fcM  =Array.from({length:12},(_,i)=>(fcData||[]).filter(f=>f.mes===i+1).reduce((s,f)=>s+f.monto,0));
+  const real=realM.reduce((s,v)=>s+v,0),ppto=pptoM.reduce((s,v)=>s+v,0),fcTot=fcM.reduce((s,v)=>s+v,0);
+  const cierre=real+fcTot,vs=ppto?(cierre-ppto)/ppto*100:0;
+  document.getElementById('fc-r').textContent=fmt(real);
+  document.getElementById('fc-f').textContent=fmt(fcTot);
+  document.getElementById('fc-c').textContent=fmt(cierre);
+  const fcv=document.getElementById('fc-v');
+  fcv.textContent=ppto?(vs>=0?'+':'')+vs.toFixed(1)+'%':'-';
+  fcv.style.color=vs>5?'var(--rd)':vs<-5?'var(--gn)':'var(--or)';
+  const firstTid=tid||_teams[0]?.id||'';
+  const firstCid=cid||_cods[0]?.id||'';
+  document.getElementById('fc-grid').innerHTML=MES.map((m,i)=>{
+    const mes=i+1,r=realM[i],b=pptoM[i],fc=fcM[i],isReal=r>0,val=r>0?r:fc;
+    const pctE=b>0?Math.round((r||fc)/b*100):null;
+    const pc=pctE===null?'var(--c5)':pctE>100?'var(--rd)':pctE>80?'var(--or)':'var(--gn)';
+    return`<div class="mgm${val?' has':''}">
+      <div class="mgm-lbl" style="margin-bottom:5px">${m}<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:${isReal?'var(--n2)':'#EDE9FE'};color:${isReal?'#fff':'#5B21B6'}">${isReal?'Real':'FC'}</span></div>
+      <input type="number" value="${Math.round(val)||''}" placeholder="0" ${isReal?'disabled':''}
+        style="width:100%;padding:4px 6px;border:1px solid ${isReal?'var(--c2)':'var(--tl)'};border-radius:var(--radius);font-family:IBM Plex Mono,monospace;font-size:13px;font-weight:600;background:${isReal?'var(--c1)':'var(--t2)'};${isReal?'opacity:.6':''}text-align:right"
+        onchange="saveFc('${firstTid}','${firstCid}',${a},${mes},this)">
+      ${b?`<div style="font-size:9px;color:${pc};margin-top:3px">ppto ${fmt(b)}${pctE!==null?' · '+pctE+'%':''}</div>`:''}
+    </div>`;
+  }).join('');
+  // Chart
+  const maxV=Math.max(...realM,...pptoM,...fcM,1),H=100,bw=14,gap=4,padL=18,svgW=12*(bw*2+gap)+padL+8;
+  let bars='';
+  MES.forEach((_,i)=>{
+    const r=realM[i],b=pptoM[i],fc=fcM[i];
+    const rh=Math.max(Math.round((r/maxV)*(H-12)),r>0?2:0);
+    const bh=Math.max(Math.round((b/maxV)*(H-12)),b>0?2:0);
+    const fch=Math.max(Math.round((fc/maxV)*(H-12)),fc>0&&r===0?2:0);
+    const x=padL+i*(bw*2+gap);
+    if(r>0)bars+=`<rect x="${x}" y="${H-rh}" width="${bw}" height="${rh}" fill="#1B3A6B" rx="2"/>`;
+    else if(fc>0)bars+=`<rect x="${x}" y="${H-fch}" width="${bw}" height="${fch}" fill="#00A8A8" rx="2" opacity=".7"/>`;
+    if(b>0)bars+=`<rect x="${x+bw+1}" y="${H-bh}" width="${bw}" height="${bh}" fill="#E2E8F0" rx="2"/>`;
+    bars+=`<text x="${x+bw}" y="${H+11}" text-anchor="middle" font-size="8" fill="#94A3B8">${MES[i].slice(0,1)}</text>`;
+  });
+  document.getElementById('fc-chart').innerHTML=`<svg width="100%" viewBox="0 0 ${svgW} ${H+14}" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:100%">${bars}</svg>
+  <div style="display:flex;gap:12px;margin-top:4px;font-size:10px;color:var(--c5)">
+    <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#1B3A6B;border-radius:2px;display:inline-block"></span>Real</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#00A8A8;border-radius:2px;display:inline-block;opacity:.7"></span>Forecast</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#E2E8F0;border-radius:2px;display:inline-block"></span>Ppto</span>
+  </div>`;
+};
+async function saveFc(tid,cid,a,mes,inp){
+  if(!tid||!cid)return;
+  const val=parseInt(inp.value)||0;
+  await PUT(`/forecast/${tid}/${cid}/${a}/${mes}`,{monto:val});
+  toast('Forecast guardado','ok');
+  renders.forecast();
+}
+
+// ─── TRAZABILIDAD ────────────────────────────────────────────────
+renders.trazabilidad=async function(){
+  const pagos=(await GET('/pagos?anio='+anio()))||[];
+  const nonUsd=pagos.filter(p=>p.moneda!=='USD');
+  document.getElementById('tr-tbl').innerHTML=nonUsd.length?nonUsd.map(p=>`<tr>
+    <td style="font-size:10px">${p.fecha}</td>
+    <td style="font-size:11px">${p.pers_nombre||'—'}</td>
+    <td>${p.prov_nombre||'—'}</td>
+    <td class="mn">${(p.monto_orig||0).toLocaleString('es-CL')}</td>
+    <td><span class="tag ${monTag(p.moneda)}">${p.moneda}</span></td>
+    <td class="mn">${(p.tc||0).toFixed(6)}</td>
+    <td class="mn" style="font-weight:600;color:var(--tl)">${fmt(p.monto_usd)}</td>
+    <td class="mn" style="font-size:10px">${p.cod_nombre||''}</td>
+  </tr>`).join(''):'<tr><td colspan="8" class="empty">No hay pagos en moneda distinta a USD</td></tr>';
+};
+
+// ─── FTE ─────────────────────────────────────────────────────────
+let selFte=null;
+function ftTab(el,id){
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  document.querySelectorAll('#v-fte .tp').forEach(t=>t.classList.remove('on'));
+  document.getElementById(id)?.classList.add('on');
+  if(id==='ft-hc')renderHC();
+  if(id==='ft-pagos')renderFtePagos();
+}
+renders.fte=async function(){
+  const personas=await GET('/personas');if(!personas)return;
+  const hc=await GET('/fte/headcount?anio='+anio());
+  const tot=(hc?.byTeam||[]).reduce((s,t)=>s+(t.costo||0),0);
+  const n=personas.length;
+  document.getElementById('fte-kpis').innerHTML=`
+    <div class="kc b"><div class="kl">Total personas</div><div class="kv">${n}</div></div>
+    <div class="kc t"><div class="kl">Gasto YTD</div><div class="kv">${fmt(tot)}</div></div>
+    ${(hc?.byTeam||[]).slice(0,3).map((t,i)=>`<div class="kc" style="border-top-color:${t.color}"><div class="kl">${t.nombre.split(' ').slice(0,2).join(' ')}</div><div class="kv">${t.n}</div><div class="ks">${fmt(t.costo)}</div></div>`).join('')}`;
+  renderFteList(personas);
+};
+function renderFteList(personas){
+  const tf=document.getElementById('fte-tf')?.value||'';
+  const tt=document.getElementById('fte-tt')?.value||'';
+  if(!personas)personas=[];
+  let list=personas;
+  if(tf)list=list.filter(p=>(p.team_ids||'').includes(tf));
+  if(tt)list=list.filter(p=>p.tipo===tt);
+  const cntEl=document.getElementById('fte-cnt');if(cntEl)cntEl.textContent=`Personas (${list.length})`;
+  const el=document.getElementById('fte-list');if(!el)return;
+  el.innerHTML=list.map(p=>{
+    const teams=(p.team_ids||'').split(',').filter(Boolean);
+    const tNoms=(p.team_nombres||'').split(',').filter(Boolean);
+    const tCols=(p.team_colores||'').split(',').filter(Boolean);
+    return`<div class="fte-card${selFte===p.id?' sel':''}" onclick="showFte('${p.id}')">
+      <div class="av" style="background:${p.color||'#888'};width:30px;height:30px;font-size:10px">${ini(p.nombre)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+        <div style="font-size:10px;color:var(--c5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.empresa||''}</div>
+        <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap">
+          ${tNoms.slice(0,3).map((n,i)=>`<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:${(tCols[i]||'#888')}18;color:${tCols[i]||'#888'};font-weight:500;border:1px solid ${(tCols[i]||'#888')}30">${n.split(' ').slice(0,2).join(' ')}</span>`).join('')}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;padding-left:4px">
+        ${p.gasto_total>0?`<div class="mn" style="font-weight:600;font-size:11px">${fmt(p.gasto_total)}</div>`:''}
+        <button class="btn btn-gh btn-sm" style="margin-top:2px" onclick="event.stopPropagation();openM('fte','${p.id}')">✎</button>
+      </div>
+    </div>`;
+  }).join('')||'<div class="empty">Sin personas</div>';
+}
+async function showFte(id){
+  selFte=id;
+  document.querySelectorAll('.fte-card').forEach(el=>el.classList.toggle('sel',el.getAttribute('onclick')?.includes(`'${id}'`)));
+  const det=document.getElementById('fte-det');
+  det.innerHTML='<div class="loading">Cargando...</div>';
+  const p=await GET('/personas/'+id);if(!p)return;
+  const pagos=p.pagos||[];const teams=p.teams||[];
+  const tot=pagos.reduce((s,g)=>s+(g.monto_usd||0),0);
+  const byCod={};pagos.forEach(g=>{if(!byCod[g.cod_nombre])byCod[g.cod_nombre]={cod:g.cod_nombre,tipo:g.cod_tipo,total:0};byCod[g.cod_nombre].total+=g.monto_usd;});
+  det.style.display='block';det.style.alignItems='flex-start';det.style.justifyContent='flex-start';det.style.overflow='auto';
+  det.innerHTML=`
+    <div style="background:var(--nv);padding:13px 15px;border-radius:var(--radius) var(--radius) 0 0;display:flex;gap:10px;align-items:center">
+      <div class="av" style="background:${p.color||'#888'};width:38px;height:38px;font-size:13px">${ini(p.nombre)}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#fff">${p.nombre}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4)">${p.cargo||''} · ${p.empresa||''} · ${p.tipo||''}</div>
+      ${p.email?`<div style="font-size:10px;color:rgba(255,255,255,.3)">${p.email}</div>`:''}</div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:none" onclick="openM('fte','${p.id}')">✎</button>
+    </div>
+    <div style="padding:12px 15px;background:var(--wh);border-radius:0 0 var(--radius) var(--radius);border:1px solid var(--c2);border-top:none">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px">
+        <div style="background:var(--c1);border-radius:var(--radius);padding:8px"><div style="font-size:9px;color:var(--c5);text-transform:uppercase;margin-bottom:2px">Total YTD</div><div class="mn" style="font-size:14px;font-weight:600">${fmt(tot)}</div></div>
+        <div style="background:var(--c1);border-radius:var(--radius);padding:8px"><div style="font-size:9px;color:var(--c5);text-transform:uppercase;margin-bottom:2px">Pagos</div><div class="mn" style="font-size:14px;font-weight:600">${pagos.length}</div></div>
+        <div style="background:var(--c1);border-radius:var(--radius);padding:8px"><div style="font-size:9px;color:var(--c5);text-transform:uppercase;margin-bottom:2px">Teams</div><div class="mn" style="font-size:14px;font-weight:600">${teams.length}</div></div>
+      </div>
+      ${Object.values(byCod).length?`<div style="font-size:11px;font-weight:600;color:var(--c7);margin-bottom:7px">Distribución por código:</div>
+      ${Object.values(byCod).map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 9px;margin-bottom:4px;background:${c.tipo==='PEP'?'#EFF6FF':'#F5F3FF'};border-left:3px solid ${c.tipo==='PEP'?'#1D4ED8':'#7C3AED'};border-radius:0 var(--radius) var(--radius) 0">
+        <div class="mn" style="font-size:11px;font-weight:600;flex:1">${c.cod||'—'}</div>
+        <span class="tag ${c.tipo==='PEP'?'tg-pep':'tg-ord'}">${c.tipo||''}</span>
+        <div class="mn" style="font-weight:600">${fmt(c.total)}</div>
+      </div>`).join('')}`:''}
+      <div style="font-size:11px;font-weight:600;color:var(--c7);margin:10px 0 7px">Últimos pagos:</div>
+      <div style="overflow-x:auto;max-height:180px">
+      <table style="font-size:11px"><thead><tr style="background:var(--c1)"><th style="padding:5px 8px">Mes</th><th style="padding:5px 8px">Código</th><th style="padding:5px 8px">Orig.</th><th style="padding:5px 8px">Mon.</th><th style="padding:5px 8px">USD</th><th style="padding:5px 8px">Días</th></tr></thead>
+      <tbody>${pagos.slice(0,20).map(g=>`<tr style="border-bottom:1px solid var(--c2)">
+        <td style="padding:5px 8px">${MES[g.mes-1]||g.mes} ${g.anio}</td>
+        <td style="padding:5px 8px;font-family:IBM Plex Mono,monospace;font-size:10px">${g.codigo||''}</td>
+        <td style="padding:5px 8px;font-family:IBM Plex Mono,monospace">${(g.monto_orig||0).toLocaleString('es-CL')}</td>
+        <td style="padding:5px 8px"><span class="tag ${monTag(g.moneda)}" style="font-size:9px">${g.moneda}</span></td>
+        <td style="padding:5px 8px;font-family:IBM Plex Mono,monospace;font-weight:600">${fmt(g.monto_usd)}</td>
+        <td style="padding:5px 8px">${g.dias||'—'}</td>
+      </tr>`).join('')}</tbody></table></div>
+    </div>`;
+}
+
+async function renderHC(){
+  const a=parseInt(document.getElementById('hc-anio')?.value||2026);
+  const tf=document.getElementById('hc-team')?.value||'';
+  const data=await GET(`/fte/headcount?anio=${a}`+(tf?`&team_id=${tf}`:''));
+  if(!data)return;
+  const mkMini=(arr,labelKey,nKey,colorFn)=>{
+    if(!arr?.length)return'<div class="empty">Sin datos</div>';
+    const maxN=Math.max(...arr.map(d=>d[nKey]||0),1);
+    const H=80,bw=Math.min(40,Math.floor(200/arr.length)-5),gap=6,svgW=arr.length*(bw+gap)+20;
+    let b='';
+    arr.forEach((d,i)=>{
+      const bh=Math.max(Math.round((d[nKey]/maxN)*(H-14)),d[nKey]>0?2:0);
+      const x=10+i*(bw+gap),col=colorFn(d,i);
+      const lbl=(d[labelKey]||'').slice(0,4);
+      b+=`<rect x="${x}" y="${H-bh}" width="${bw}" height="${bh}" fill="${col}" rx="2"/>
+      <text x="${x+bw/2}" y="${H-bh-4}" text-anchor="middle" font-size="10" font-weight="600" fill="${col}">${d[nKey]||''}</text>
+      <text x="${x+bw/2}" y="${H+12}" text-anchor="middle" font-size="8" fill="#94A3B8">${lbl}</text>`;
+    });
+    return`<svg width="100%" viewBox="0 0 ${svgW} ${H+16}" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:100%;overflow:visible">${b}</svg>`;
+  };
+  const tFilter=tf?data.byTeam.filter(t=>t.id===tf):data.byTeam;
+  document.getElementById('hc-team-chart').innerHTML=mkMini(tFilter,'nombre','n',t=>t.color||'#1B3A6B');
+  document.getElementById('hc-q-chart').innerHTML=mkMini(data.byQ,'q','n',(_,i)=>COLORS[i]);
+  document.getElementById('hc-m-chart').innerHTML=mkMini(data.byMes.map((m,i)=>({...m,label:MES[i].slice(0,3)})),'label','n',(_,i)=>i<3?'#1B3A6B':i<6?'#00A8A8':i<9?'#EA580C':'#16A34A');
+  document.getElementById('hc-prov-chart').innerHTML=data.byProv?.length?svgHBars(data.byProv,'nombre','total'):'<div class="empty">Sin pagos</div>';
+}
+
+async function renderFtePagos(){
+  const a=anio(),tid=document.getElementById('ftp-team')?.value||'',q=document.getElementById('ftp-q')?.value||'';
+  const params=new URLSearchParams({anio:a});
+  if(tid)params.set('team_id',tid);if(q)params.set('q',q);
+  const pagos=await GET('/pagos?'+params);if(!pagos)return;
+  const tot=pagos.reduce((s,p)=>s+(p.monto_usd||0),0);
+  const ttEl=document.getElementById('ftp-tt');
+  if(ttEl)ttEl.textContent=`Pagos por persona · ${pagos.length} registros · ${fmt(tot)} USD`;
+  document.getElementById('ftp-tbl').innerHTML=pagos.map(p=>`<tr>
+    <td style="font-weight:600;font-size:11px">${p.pers_nombre||'—'}</td>
+    <td style="font-size:11px;color:var(--c5)">${p.pers_empresa||''}</td>
+    <td><span style="display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${p.team_color||'#888'};display:inline-block"></span>${(p.team_nombre||'').split(' ').slice(0,2).join(' ')}</span></td>
+    <td class="mn" style="font-size:10px">${p.cod_nombre||''}</td>
+    <td style="font-size:10px">${p.fecha}</td>
+    <td class="mn">${p.dias||'—'}</td>
+    <td class="mn">${(p.monto_orig||0).toLocaleString('es-CL')}</td>
+    <td><span class="tag ${monTag(p.moneda)}">${p.moneda}</span></td>
+    <td class="mn" style="font-weight:600">${fmt(p.monto_usd)}</td>
+    <td style="font-size:10px;color:var(--c5)">${p.descripcion||''}</td>
+  </tr>`).join('')||'<tr><td colspan="10" class="empty">Sin registros</td></tr>';
+}
+
+// ─── TEAMS ───────────────────────────────────────────────────────
+renders.teams=async function(){
+  const teams=await GET('/teams');if(!teams)return;
+  document.getElementById('teams-tbl').innerHTML=teams.map(t=>`<tr>
+    <td><div style="width:20px;height:20px;border-radius:50%;background:${t.color};display:inline-block"></div></td>
+    <td style="font-weight:600">${t.nombre}</td><td>${t.pm}</td>
+    <td><span class="tag tg-ok">Activo</span></td>
+    <td><button class="btn btn-gh btn-sm" onclick='openM("team","${t.id}")'>✎ Editar</button>
+    <button class="btn btn-rd btn-sm" style="margin-left:3px" onclick="delTeam('${t.id}')">✕</button></td>
+  </tr>`).join('');
+};
+
+// ─── CODIGOS ─────────────────────────────────────────────────────
+renders.codigos=async function(){
+  const cods=await GET('/codigos');if(!cods)return;
+  ['pep','ord'].forEach(tipo=>{
+    document.getElementById(tipo+'-tbl').innerHTML=cods.filter(c=>tipo==='pep'?c.tipo==='PEP':c.tipo==='Orden').map(c=>`<tr>
+      <td class="mn" style="font-size:11px">${c.codigo}</td>
+      <td>${c.team_nombre?`<span style="display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${c.team_color||'#888'};display:inline-block"></span>${c.team_nombre}</span>`:'—'}</td>
+      <td style="font-size:11px;color:var(--c5);max-width:130px;overflow:hidden;text-overflow:ellipsis">${c.descripcion||'—'}</td>
+      <td class="mn">${fmt(c.presupuesto||0)}</td>
+      <td><button class="btn btn-gh btn-sm" onclick='openM("cod","${c.tipo}","${c.id}")'>✎</button>
+      <button class="btn btn-rd btn-sm" style="margin-left:2px" onclick="delCod('${c.id}')">✕</button></td>
+    </tr>`).join('')||'<tr><td colspan="5" class="empty">Sin registros</td></tr>';
+  });
+};
+
+// ─── PROVEEDORES ─────────────────────────────────────────────────
+renders.proveedores=async function(){
+  const provs=await GET('/proveedores');if(!provs)return;
+  document.getElementById('prov-tbl').innerHTML=provs.map(p=>`<tr>
+    <td style="font-weight:600">${p.nombre}</td>
+    <td><span class="tag ${monTag(p.moneda)}">${p.moneda}</span></td>
+    <td>${p.categoria}</td>
+    <td class="mn">${fmt(p.gasto_ytd||0)}</td>
+    <td><button class="btn btn-gh btn-sm" onclick='openM("prov","${p.id}")'>✎</button>
+    <button class="btn btn-rd btn-sm" style="margin-left:3px" onclick="delProv('${p.id}')">✕</button></td>
+  </tr>`).join('');
+};
+
+// ─── TC ──────────────────────────────────────────────────────────
+renders.tc=async function(){
+  const tcs=await GET('/tc');if(!tcs)return;
+  document.getElementById('tc-tbl').innerHTML=tcs.map(t=>`<tr>
+    <td>${t.fecha}</td>
+    <td><span class="tag ${monTag(t.moneda)}">${t.moneda}</span></td>
+    <td class="mn">${t.valor.toFixed(t.moneda==='CLP'?5:t.moneda==='BRL'?4:2)}</td>
+    <td><span class="tag tg-ok">${t.fuente}</span></td>
+  </tr>`).join('');
+};
+async function saveTC(){
+  const mon=document.getElementById('tc-mon').value,val=parseFloat(document.getElementById('tc-val').value)||0,fec=document.getElementById('tc-fec').value;
+  if(!val)return toast('Ingresa un valor','err');
+  TC[mon]=val;
+  await POST('/tc',{fecha:fec,moneda:mon,valor:val});
+  toast('TC guardado','ok');renders.tc();
+}
+
+// ─── MODALS ───────────────────────────────────────────────────────
+function openM(type,arg1,arg2){
+  const m=document.getElementById('m-'+type);if(!m)return;
+  populateSels();
+  if(type==='pago'){
+    const isEdit=arg1&&typeof arg1==='object'&&arg1.id;
+    document.getElementById('m-pago-t').textContent=isEdit?'Editar pago':'Nuevo pago';
+    document.getElementById('mp-id').value=isEdit?arg1.id:'';
+    if(isEdit){
+      const p=arg1;
+      document.getElementById('mp-team').value=p.team_id||'';updMpPers().then(()=>{if(p.persona_id)document.getElementById('mp-pers').value=p.persona_id;});
+      document.getElementById('mp-cod').value=p.codigo_id||'';
+      document.getElementById('mp-prov').value=p.proveedor_id||'';
+      document.getElementById('mp-cat').value=p.categoria||'FTE';
+      document.getElementById('mp-fec').value=p.fecha||'';
+      document.getElementById('mp-mnt').value=p.monto_orig||0;
+      document.getElementById('mp-mon').value=p.moneda||'USD';
+      document.getElementById('mp-pct').value=p.pct_codigo||100;
+      document.getElementById('mp-dias').value=p.dias||21;
+      document.getElementById('mp-desc').value=p.descripcion||'';
+      calcTC();
+    } else {
+      ['mp-mnt','mp-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      document.getElementById('mp-pct').value=100;
+      document.getElementById('mp-dias').value=21;
+      calcTC();
+    }
+  }
+  if(type==='ppto'){const bp=document.getElementById('bp-team');if(bp&&_teams.length&&!bp.value)bp.value=_teams[0].id;updBpCod();}
+  if(type==='team'){
+    const id=typeof arg1==='string'?arg1:null;
+    document.getElementById('m-team-t').textContent=id?'Editar team':'Nuevo team';
+    document.getElementById('mt-id').value=id||'';
+    if(id){const t=_teams.find(x=>x.id===id);if(t){document.getElementById('mt-nom').value=t.nombre;document.getElementById('mt-pm').value=t.pm;document.getElementById('mt-col').value=t.color;}}
+    else{['mt-nom','mt-pm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('mt-col').value='#1B3A6B';}
+  }
+  if(type==='cod'){
+    const tipo=arg1||'PEP',id=arg2;
+    document.getElementById('m-cod-t').textContent=(id?'Editar ':'Nuevo ')+tipo;
+    document.getElementById('mc-id').value=id||'';document.getElementById('mc-tipo').value=tipo;updNat();
+    if(id){const c=_cods.find(x=>x.id===id);if(c){document.getElementById('mc-cod').value=c.codigo;document.getElementById('mc-desc').value=c.descripcion||'';document.getElementById('mc-team').value=c.team_id||'';document.getElementById('mc-ppto').value=c.presupuesto||0;}}
+    else{['mc-cod','mc-desc','mc-ppto'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+  }
+  if(type==='prov'){
+    const id=typeof arg1==='string'?arg1:null;
+    document.getElementById('m-prov-t').textContent=id?'Editar proveedor':'Nuevo proveedor';
+    document.getElementById('mv-id').value=id||'';
+    if(id){const p=_provs.find(x=>x.id===id);if(p){document.getElementById('mv-nom').value=p.nombre;document.getElementById('mv-mon').value=p.moneda;document.getElementById('mv-cat').value=p.categoria;}}
+    else{document.getElementById('mv-nom').value='';}
+  }
+  if(type==='fte'){
+    const id=typeof arg1==='string'?arg1:null;
+    document.getElementById('m-fte-t').textContent=id?'Editar persona':'Nueva persona';
+    document.getElementById('mf-id').value=id||'';
+    if(id){
+      const p=_personas.find(x=>x.id===id);
+      if(p){document.getElementById('mf-nom').value=p.nombre;document.getElementById('mf-cargo').value=p.cargo||'';document.getElementById('mf-emp').value=p.empresa||'';document.getElementById('mf-email').value=p.email||'';document.getElementById('mf-tipo').value=p.tipo||'Externa';document.getElementById('mf-col').value=p.color||'#1B3A6B';}
+    } else {
+      ['mf-nom','mf-cargo','mf-emp','mf-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      document.getElementById('mf-tipo').value='Externa';document.getElementById('mf-col').value='#1B3A6B';
+    }
+  }
+  m.classList.add('on');
+}
+function closeM(type){document.getElementById('m-'+type)?.classList.remove('on');}
+
+// ─── SAVE/DELETE FUNCTIONS ────────────────────────────────────────
+function calcTC(){
+  const mnt=parseFloat(document.getElementById('mp-mnt')?.value)||0;
+  const mon=document.getElementById('mp-mon')?.value||'USD';
+  const pct=parseFloat(document.getElementById('mp-pct')?.value)||100;
+  const tc=TC[mon]||1;
+  const usd=Math.round(mnt*tc*(pct/100));
+  const lbls={USD:'USD base',CLP:`1 CLP = ${tc.toFixed(5)} USD`,UF:`1 UF = ${tc.toFixed(2)} USD`,BRL:`1 BRL = ${tc.toFixed(4)} USD`,EUR:`1 EUR = ${tc.toFixed(4)} USD`};
+  const h=document.getElementById('mp-tc');
+  if(h)h.textContent=`${lbls[mon]||'TC: '+tc.toFixed(6)} · Aplicado (${pct}%): ${fmt(usd)} USD`;
+}
+function updNat(){const t=document.getElementById('mc-tipo')?.value;const n=document.getElementById('mc-nat');if(n)n.value=t==='PEP'?'CAPEX':'OPEX';}
+function updBpCod(){
+  const tid=document.getElementById('bp-team')?.value||'';
+  const el=document.getElementById('bp-cod');if(!el)return;
+  el.innerHTML=_cods.filter(c=>!tid||c.team_id===tid).map(c=>`<option value="${c.id}">${c.codigo}</option>`).join('');
+  renderBpMes();
+}
+function renderBpMes(){
+  const wrap=document.getElementById('bp-meses');if(!wrap)return;
+  wrap.innerHTML=MES.map((m,i)=>`<div class="fl"><label>${m}</label><input type="number" id="bm${i+1}" placeholder="0" oninput="updBpTot()"></div>`).join('');
+  const tid=document.getElementById('bp-team')?.value||'',cid=document.getElementById('bp-cod')?.value||'',a=parseInt(document.getElementById('bp-anio')?.value)||2026;
+  if(tid&&cid)GET(`/presupuestos?team_id=${tid}&codigo_id=${cid}&anio=${a}`).then(bs=>{(bs||[]).forEach(b=>{const el=document.getElementById('bm'+b.mes);if(el)el.value=b.monto;});updBpTot();});
+}
+function updBpTot(){let t=0;for(let i=1;i<=12;i++){const el=document.getElementById('bm'+i);if(el)t+=parseFloat(el.value)||0;}const et=document.getElementById('bp-tot');if(et)et.textContent=fmt(t);}
+function equalPpto(){const cid=document.getElementById('bp-cod')?.value,c=_cods.find(x=>x.id===cid),base=c?Math.round((c.presupuesto||0)/12):0;for(let i=1;i<=12;i++){const el=document.getElementById('bm'+i);if(el)el.value=base;}updBpTot();}
+
+async function savePago(){
+  const id=document.getElementById('mp-id')?.value;
+  const body={team_id:document.getElementById('mp-team')?.value,codigo_id:document.getElementById('mp-cod')?.value,proveedor_id:document.getElementById('mp-prov')?.value||null,persona_id:document.getElementById('mp-pers')?.value||null,categoria:document.getElementById('mp-cat')?.value,fecha:document.getElementById('mp-fec')?.value,monto_orig:parseFloat(document.getElementById('mp-mnt')?.value)||0,moneda:document.getElementById('mp-mon')?.value,tc:TC[document.getElementById('mp-mon')?.value]||1,pct_codigo:parseFloat(document.getElementById('mp-pct')?.value)||100,dias:parseInt(document.getElementById('mp-dias')?.value)||21,descripcion:document.getElementById('mp-desc')?.value||''};
+  if(!body.team_id||!body.codigo_id||!body.monto_orig)return toast('Team, código y monto son requeridos','err');
+  const r=id?await PUT('/pagos/'+id,body):await POST('/pagos',body);
+  if(r){toast(id?'Pago actualizado':'Pago registrado','ok');closeM('pago');await loadMasters();renders.pagos();renders.dashboard();}
+}
+function editPago(p){openM('pago',p);}
+async function delPago(id){if(!confirm('¿Eliminar este pago?'))return;await DEL('/pagos/'+id);toast('Eliminado','ok');renders.pagos();renders.dashboard();}
+
+async function savePpto(){
+  const tid=document.getElementById('bp-team')?.value,cid=document.getElementById('bp-cod')?.value,a=parseInt(document.getElementById('bp-anio')?.value)||2026;
+  if(!tid||!cid)return toast('Selecciona team y código','err');
+  const meses=Array.from({length:12},(_,i)=>({mes:i+1,monto:parseFloat(document.getElementById('bm'+(i+1))?.value)||0}));
+  await POST('/presupuestos/bulk',{team_id:tid,codigo_id:cid,anio:a,meses});
+  toast('Presupuesto guardado','ok');closeM('ppto');renders.presupuesto();renders.dashboard();
+}
+
+async function saveTeam(){
+  const id=document.getElementById('mt-id')?.value;
+  const body={nombre:document.getElementById('mt-nom')?.value.trim(),pm:document.getElementById('mt-pm')?.value.trim(),color:document.getElementById('mt-col')?.value};
+  if(!body.nombre)return toast('Nombre requerido','err');
+  const r=id?await PUT('/teams/'+id,body):await POST('/teams',body);
+  if(r){toast(id?'Team actualizado':'Team creado','ok');closeM('team');await loadMasters();renders.teams();renders.dashboard();}
+}
+async function delTeam(id){if(!confirm('¿Eliminar?'))return;await DEL('/teams/'+id);toast('Eliminado','ok');await loadMasters();renders.teams();}
+
+async function saveCod(){
+  const id=document.getElementById('mc-id')?.value;
+  const body={codigo:document.getElementById('mc-cod')?.value.trim(),descripcion:document.getElementById('mc-desc')?.value.trim(),tipo:document.getElementById('mc-tipo')?.value,team_id:document.getElementById('mc-team')?.value||null,presupuesto:parseFloat(document.getElementById('mc-ppto')?.value)||0};
+  if(!body.codigo)return toast('Código requerido','err');
+  const r=id?await PUT('/codigos/'+id,body):await POST('/codigos',body);
+  if(r){toast(id?'Actualizado':'Creado','ok');closeM('cod');await loadMasters();renders.codigos();}
+}
+async function delCod(id){if(!confirm('¿Eliminar?'))return;await DEL('/codigos/'+id);toast('Eliminado','ok');await loadMasters();renders.codigos();}
+
+async function saveProv(){
+  const id=document.getElementById('mv-id')?.value;
+  const body={nombre:document.getElementById('mv-nom')?.value.trim(),moneda:document.getElementById('mv-mon')?.value,categoria:document.getElementById('mv-cat')?.value};
+  if(!body.nombre)return toast('Nombre requerido','err');
+  const r=id?await PUT('/proveedores/'+id,body):await POST('/proveedores',body);
+  if(r){toast(id?'Actualizado':'Creado','ok');closeM('prov');await loadMasters();renders.proveedores();}
+}
+async function delProv(id){if(!confirm('¿Eliminar?'))return;await DEL('/proveedores/'+id);toast('Eliminado','ok');await loadMasters();renders.proveedores();}
+
+async function saveFTE(){
+  const id=document.getElementById('mf-id')?.value;
+  const body={nombre:document.getElementById('mf-nom')?.value.trim(),cargo:document.getElementById('mf-cargo')?.value.trim(),empresa:document.getElementById('mf-emp')?.value.trim(),tipo:document.getElementById('mf-tipo')?.value,email:document.getElementById('mf-email')?.value.trim(),color:document.getElementById('mf-col')?.value,team_id:document.getElementById('mf-team')?.value||null};
+  if(!body.nombre)return toast('Nombre requerido','err');
+  const r=id?await PUT('/personas/'+id,body):await POST('/personas',body);
+  if(r){toast(id?'Persona actualizada':'Persona creada','ok');closeM('fte');await loadMasters();renders.fte();}
+}
+
+async function exportCSV(){
+  window.location.href=`/api/export/pagos?anio=${anio()}`;
+  toast('Descargando CSV...','ok');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────
+(async()=>{
+  await loadMasters();
+  renders.dashboard();
+})();
+</script>
+</body>
+</html>
